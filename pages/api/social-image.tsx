@@ -18,6 +18,11 @@ export const config = {
   runtime: 'experimental-edge'
 }
 
+export const optimizedImageUrl = (url: string, width: number, quality: number) => {
+  // Assuming your image service supports resizing and compression via URL parameters
+  return `${url}?width=${width}&quality=${quality}`;
+};
+
 export default async function OGImage(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const pageId = searchParams.get('id') || rootNotionPageId
@@ -61,7 +66,7 @@ export default async function OGImage(req: NextRequest) {
       >
         {pageInfo.image && (
           <img
-            src={pageInfo.image}
+            src={optimizedImageUrl(pageInfo.image, 1200, 80)} // Fetch a 1200px wide image at 80% quality
             style={{
               position: 'absolute',
               width: '100%',
