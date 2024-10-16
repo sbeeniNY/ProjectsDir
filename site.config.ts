@@ -10,7 +10,7 @@ export default siteConfig({
 
   // basic site info (required)
   name: 'Projects wiki collection',
-  domain: 'nextjs-notion-starter-kit.transitivebullsh.it',
+  domain: 'stealth-blinker-f8b.notion.site',
   author: 'Subin Cho',
 
   // open graph metadata (optional)
