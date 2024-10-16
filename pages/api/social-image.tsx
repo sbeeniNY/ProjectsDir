@@ -1,27 +1,18 @@
 import * as React from 'react'
 import { NextRequest } from 'next/server'
-
 import { ImageResponse } from '@vercel/og'
 
 import { api, apiHost, rootNotionPageId } from '@/lib/config'
 import { NotionPageInfo } from '@/lib/types'
 
-const interRegularFontP = fetch(
-  new URL('../../public/fonts/Inter-Regular.ttf', import.meta.url)
-).then((res) => res.arrayBuffer())
-
-const interBoldFontP = fetch(
-  new URL('../../public/fonts/Inter-SemiBold.ttf', import.meta.url)
-).then((res) => res.arrayBuffer())
+// 이미지 URL 최적화 함수
+const optimizedImageUrl = (url: string, width: number, quality: number) => {
+  return `${url}?width=${width}&quality=${quality}`;  // 이미지 크기와 품질을 조정
+};
 
 export const config = {
   runtime: 'experimental-edge'
 }
-
-export const optimizedImageUrl = (url: string, width: number, quality: number) => {
-  // Assuming your image service supports resizing and compression via URL parameters
-  return `${url}?width=${width}&quality=${quality}`;
-};
 
 export default async function OGImage(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -41,12 +32,6 @@ export default async function OGImage(req: NextRequest) {
     return new Response(pageInfoRes.statusText, { status: pageInfoRes.status })
   }
   const pageInfo: NotionPageInfo = await pageInfoRes.json()
-  console.log(pageInfo)
-
-  const [interRegularFont, interBoldFont] = await Promise.all([
-    interRegularFontP,
-    interBoldFontP
-  ])
 
   return new ImageResponse(
     (
@@ -66,25 +51,12 @@ export default async function OGImage(req: NextRequest) {
       >
         {pageInfo.image && (
           <img
-            src={optimizedImageUrl(pageInfo.image, 1200, 80)} // Fetch a 1200px wide image at 80% quality
+            src={optimizedImageUrl(pageInfo.image, 1200, 80)}  // 최적화된 이미지 불러오기
             style={{
               position: 'absolute',
               width: '100%',
               height: '100%',
               objectFit: 'cover'
-              // TODO: satori doesn't support background-size: cover and seems to
-              // have inconsistent support for filter + transform to get rid of the
-              // blurred edges. For now, we'll go without a blur filter on the
-              // background, but Satori is still very new, so hopefully we can re-add
-              // the blur soon.
-
-              // backgroundImage: pageInfo.image
-              //   ? `url(${pageInfo.image})`
-              //   : undefined,
-              // backgroundSize: '100% 100%'
-              // TODO: pageInfo.imageObjectPosition
-              // filter: 'blur(8px)'
-              // transform: 'scale(1.05)'
             }}
           />
         )}
@@ -151,11 +123,10 @@ export default async function OGImage(req: NextRequest) {
             }}
           >
             <img
-              src={pageInfo.authorImage}
+              src={optimizedImageUrl(pageInfo.authorImage, 128, 80)}  // 저자 이미지 최적화
               style={{
                 width: '100%',
                 height: '100%'
-                // transform: 'scale(1.04)'
               }}
             />
           </div>
@@ -164,21 +135,7 @@ export default async function OGImage(req: NextRequest) {
     ),
     {
       width: 1200,
-      height: 630,
-      fonts: [
-        {
-          name: 'Inter',
-          data: interRegularFont,
-          style: 'normal',
-          weight: 400
-        },
-        {
-          name: 'Inter',
-          data: interBoldFont,
-          style: 'normal',
-          weight: 700
-        }
-      ]
+      height: 630
     }
   )
 }
