@@ -10,7 +10,7 @@ export default siteConfig({
 
   // basic site info (required)
   name: 'Projects wiki collection',
-  domain: 'stealth-blinker-f8b.notion.site',
+  domain: 'https://projects-dir.vercel.app',
   author: 'Subin Cho',
 
   // open graph metadata (optional)
